@@ -1,0 +1,21 @@
+# Visual Studio folders
+.vs/
+.vscode/
+
+# Build output
+Debug/
+Release/
+x64/
+x86/
+
+# Compiled files
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.log
+
+# CMake 
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
