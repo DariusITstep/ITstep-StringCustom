@@ -2,47 +2,59 @@
 
 int StringCustom::count = 0;
 
-// DEFAULT -> delegate
-StringCustom::StringCustom() : StringCustom(80) {}
-
-// MAIN CONSTRUCTOR
-// nullptr-model supported
+// основний
 StringCustom::StringCustom(int size) {
 
     if (size <= 0) {
-        str = nullptr;
-        len = 0;
+        this->str = nullptr;
+        this->len = 0;
     }
     else {
-        len = size;
-        str = new char[len + 1];
-        str[0] = '\0';
+        this->len = size;
+        this->str = new char[this->len + 1];
+        this->str[0] = '\0';
     }
 
     count++;
 }
 
-// FROM C-STRING -> delegate
+// за замовченням
+StringCustom::StringCustom() : StringCustom(80) {}
+
+// безпечне копіювання
+void StringCustom::safeCopy(const char* input) {
+
+    if (!input) {
+        this->str = nullptr;
+        this->len = 0;
+        return;
+    }
+
+    delete[] this->str;
+
+    this->len = strlen(input);
+    this->str = new char[this->len + 1];
+
+    strcpy_s(this->str, this->len + 1, input);
+}
+
+// с-стиль
 StringCustom::StringCustom(const char* input) : StringCustom(input ? strlen(input) : 0) {
-    if (input && str) {
-        strcpy_s(str, len + 1, input);
-    }
+    safeCopy(input);
 }
 
-// COPY -> delegate
+// ксерокс
 StringCustom::StringCustom(const StringCustom& other) : StringCustom(other.len) {
-    if (other.str && str) {
-        strcpy_s(str, len + 1, other.str);
-    }
+    safeCopy(other.str);
 }
 
-// destructor
+// деструктор
 StringCustom::~StringCustom() {
-    delete[] str;
+    delete[] this->str;
     count--;
 }
 
-// input (safe)
+// ввід рядка
 void StringCustom::inputString() {
 
     cout << "Enter string: ";
@@ -50,28 +62,19 @@ void StringCustom::inputString() {
     char buffer[1024];
     cin.getline(buffer, 1024);
 
-    delete[] str;
-
-    len = strlen(buffer);
-
-    if (len == 0) {
-        str = nullptr;
-        return;
-    }
-
-    str = new char[len + 1];
-    strcpy_s(str, len + 1, buffer);
+    safeCopy(buffer);
 }
 
-// output
+// вивід рядка
 void StringCustom::outputString() const {
-    if (str)
-        cout << str << endl;
+
+    if (this->str)
+        cout << this->str << endl;
     else
         cout << "(empty)" << endl;
 }
 
-// static
+// кількість створених о'єктів
 int StringCustom::getCount() {
     return count;
 }

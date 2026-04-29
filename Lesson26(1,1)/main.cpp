@@ -1,9 +1,11 @@
 #include "StringCustom.h"
 #include <iostream>
 
+using namespace std;
+
 int main() {
 
-    StringCustom a;              // 80
+    StringCustom a;
     a.inputString();
     a.outputString();
 
@@ -17,7 +19,7 @@ int main() {
     StringCustom d(c);
     d.outputString();
 
-    StringCustom e(0);          // nullptr empty
+    StringCustom e(0);
     e.outputString();
 
     cout << "Objects: " << StringCustom::getCount() << endl;
