@@ -13,14 +13,17 @@ int main() {
     b.inputString();
     b.outputString();
 
-    StringCustom c("Hello world");
-    c.outputString();
+    StringCustom c("Hello");
+    StringCustom d("World");
 
-    StringCustom d(c);
-    d.outputString();
+    StringCustom result = c * d;
+    result.outputString(); 
 
-    StringCustom e(0);
-    e.outputString();
+    StringCustom copy(c);
+    copy.outputString();
+
+    StringCustom empty(0);
+    empty.outputString();
 
     cout << "Objects: " << StringCustom::getCount() << endl;
 

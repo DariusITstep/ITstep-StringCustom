@@ -2,7 +2,6 @@
 
 int StringCustom::count = 0;
 
-// основний
 StringCustom::StringCustom(int size) {
 
     if (size <= 0) {
@@ -18,13 +17,12 @@ StringCustom::StringCustom(int size) {
     count++;
 }
 
-// за замовченням
 StringCustom::StringCustom() : StringCustom(80) {}
 
-// безпечне копіювання
 void StringCustom::safeCopy(const char* input) {
 
     if (!input) {
+        delete[] this->str;
         this->str = nullptr;
         this->len = 0;
         return;
@@ -38,23 +36,19 @@ void StringCustom::safeCopy(const char* input) {
     strcpy_s(this->str, this->len + 1, input);
 }
 
-// с-стиль
 StringCustom::StringCustom(const char* input) : StringCustom(input ? strlen(input) : 0) {
     safeCopy(input);
 }
 
-// ксерокс
 StringCustom::StringCustom(const StringCustom& other) : StringCustom(other.len) {
     safeCopy(other.str);
 }
 
-// деструктор
 StringCustom::~StringCustom() {
     delete[] this->str;
     count--;
 }
 
-// ввід рядка
 void StringCustom::inputString() {
 
     cout << "Enter string: ";
@@ -65,7 +59,6 @@ void StringCustom::inputString() {
     safeCopy(buffer);
 }
 
-// вивід рядка
 void StringCustom::outputString() const {
 
     if (this->str)
@@ -74,7 +67,55 @@ void StringCustom::outputString() const {
         cout << "(empty)" << endl;
 }
 
-// кількість створених о'єктів
 int StringCustom::getCount() {
     return count;
+}
+
+// ----------------------
+// оператор перетину * , беру символ першого рядка і шукаю його в другому, якщо є то додаю в результат, перевіряю дублі
+// ----------------------
+StringCustom StringCustom::operator*(const StringCustom& other) const {
+
+    if (!this->str || !other.str) {
+        return StringCustom(0);
+    }
+
+    char* buffer = new char[this->len + 1];
+    int index = 0;
+
+    for (int i = 0; i < this->len; i++) {
+
+        char c = this->str[i];
+        bool found = false;
+
+        for (int j = 0; j < other.len; j++) {
+            if (c == other.str[j]) {
+                found = true;
+                break;
+            }
+        }
+
+        if (found) {
+
+            bool exists = false;
+            for (int k = 0; k < index; k++) {
+                if (buffer[k] == c) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+                buffer[index++] = c;
+            }
+        }
+    }
+
+    buffer[index] = '\0';
+
+    StringCustom result(buffer);
+
+    delete[] buffer;
+
+    return result;
 }

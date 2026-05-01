@@ -26,4 +26,6 @@ public:
     void outputString() const;
 
     static int getCount();
+
+    StringCustom operator*(const StringCustom& other) const;
 };
