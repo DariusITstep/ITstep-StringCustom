@@ -2,6 +2,7 @@
 
 int StringCustom::count = 0;
 
+// основний конструктор
 StringCustom::StringCustom(int size) {
 
     if (size <= 0) {
@@ -17,63 +18,82 @@ StringCustom::StringCustom(int size) {
     count++;
 }
 
+// делегування
 StringCustom::StringCustom() : StringCustom(80) {}
 
+// безпечне копіювання
 void StringCustom::safeCopy(const char* input) {
 
+    delete[] this->str;
+
     if (!input) {
-        delete[] this->str;
         this->str = nullptr;
         this->len = 0;
         return;
     }
 
-    delete[] this->str;
-
     this->len = strlen(input);
+
     this->str = new char[this->len + 1];
 
     strcpy_s(this->str, this->len + 1, input);
 }
 
+// конструктор з рядка
 StringCustom::StringCustom(const char* input) : StringCustom(input ? strlen(input) : 0) {
     safeCopy(input);
 }
 
-StringCustom::StringCustom(const StringCustom& other) : StringCustom(other.len) {
-    safeCopy(other.str);
+// конструктор копіювання
+StringCustom::StringCustom(const StringCustom& other) : StringCustom(other.str) {}
+
+// move-конструктор
+StringCustom::StringCustom(StringCustom&& other) noexcept {
+
+    this->str = other.str;
+    this->len = other.len;
+
+    other.str = nullptr;
+    other.len = 0;
+
+    count++;
 }
 
+// деструктор
 StringCustom::~StringCustom() {
     delete[] this->str;
     count--;
 }
 
-void StringCustom::inputString() {
+// оператор копіювання
+StringCustom& StringCustom::operator=(const StringCustom& other) {
 
-    cout << "Enter string: ";
+    if (this == &other)
+        return *this;
 
-    char buffer[1024];
-    cin.getline(buffer, 1024);
+    safeCopy(other.str);
 
-    safeCopy(buffer);
+    return *this;
 }
 
-void StringCustom::outputString() const {
+// move-оператор
+StringCustom& StringCustom::operator=(StringCustom&& other) noexcept {
 
-    if (this->str)
-        cout << this->str << endl;
-    else
-        cout << "(empty)" << endl;
+    if (this == &other)
+        return *this;
+
+    delete[] this->str;
+
+    this->str = other.str;
+    this->len = other.len;
+
+    other.str = nullptr;
+    other.len = 0;
+
+    return *this;
 }
 
-int StringCustom::getCount() {
-    return count;
-}
-
-// ----------------------
-// оператор перетину * , беру символ першого рядка і шукаю його в другому, якщо є то додаю в результат, перевіряю дублі
-// ----------------------
+// оператор перетину рядків
 StringCustom StringCustom::operator*(const StringCustom& other) const {
 
     if (!this->str || !other.str) {
@@ -81,6 +101,7 @@ StringCustom StringCustom::operator*(const StringCustom& other) const {
     }
 
     char* buffer = new char[this->len + 1];
+
     int index = 0;
 
     for (int i = 0; i < this->len; i++) {
@@ -88,7 +109,9 @@ StringCustom StringCustom::operator*(const StringCustom& other) const {
         char c = this->str[i];
         bool found = false;
 
+        // пошук символу у другому рядку
         for (int j = 0; j < other.len; j++) {
+
             if (c == other.str[j]) {
                 found = true;
                 break;
@@ -97,8 +120,11 @@ StringCustom StringCustom::operator*(const StringCustom& other) const {
 
         if (found) {
 
+            // перевірка на повтори
             bool exists = false;
+
             for (int k = 0; k < index; k++) {
+
                 if (buffer[k] == c) {
                     exists = true;
                     break;
@@ -118,4 +144,60 @@ StringCustom StringCustom::operator*(const StringCustom& other) const {
     delete[] buffer;
 
     return result;
+}
+
+// введення рядка
+void StringCustom::inputString() {
+
+    cout << "Enter string: ";
+
+    char buffer[1024];
+
+    cin.getline(buffer, 1024);
+
+    safeCopy(buffer);
+}
+
+// виведення рядка
+void StringCustom::outputString() const {
+
+    if (this->str)
+        cout << this->str << endl;
+    else
+        cout << "(empty)" << endl;
+}
+
+// кількість об’єктів
+int StringCustom::getCount() {
+    return count;
+}
+
+// оператор доступу за індексом
+char err = '0'; // немає поки можливості обробляти помилки, але треба повертати посилання на щось існуюче...
+char& StringCustom::operator[](int index) {
+
+    if (!this->str || index < 0 || index >= this->len) {
+        return err;
+    }
+    return this->str[index];
+}
+
+// оператор пошуку символу
+int StringCustom::operator()(char symbol) const {
+
+    if (!this->str)
+        return -1;
+
+    for (int i = 0; i < this->len; i++) {
+
+        if (this->str[i] == symbol)
+            return i;
+    }
+    return -1;
+}
+
+// перетворення в int (довжина рядка)
+StringCustom::operator int() const {
+
+    return this->len;
 }
